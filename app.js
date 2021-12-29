@@ -10,6 +10,10 @@ var userInViews = require('./lib/middleware/userInViews');
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 
 // config express-session
 var sessionSetting = {
@@ -67,6 +71,20 @@ app.use(passport.session());
 app.use(userInViews());
 app.use('/', authRouter);
 app.use('/', indexRouter);
+
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.broadcast.emit('hi');
+  socket.on('chat message', (msg) => {
+    io.emit('chat message', msg);
+  });  
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+  
+});
+
 
 
 // catch 404 and forward to error handler
