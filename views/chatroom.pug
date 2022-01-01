@@ -1,8 +1,9 @@
-p hello world
 ul#messages
 form#form(action="")
-    input#input(autocomplete="off")
-    button Send
-    script(src='/socket.io/socket.io.js')
-    script(src='/javascripts/chatroom.js')
-p bbc    
+    if locals.user
+        input#input(autocomplete="off")
+        button Send
+        script(src='/socket.io/socket.io.js')
+        script(src='/javascripts/chatroom.js')
+    else
+      h4 You are not logged in! Please #[a(href="/login") Log In] to continue.
