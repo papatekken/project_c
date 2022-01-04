@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('project-c:server');
 var http = require('http');
+var secured = require('../lib/middleware/secured');
+
 
 /**
  * Get port from environment and store in Express.
@@ -22,24 +24,7 @@ app.set('port', port);
 var server = http.createServer(app);
 
 
-/**
- * Setup socket.io
- */
- 
-const {Server} = require("socket.io");
-const io = new Server(server);
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.broadcast.emit('hi');
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
-  });  
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-  
-});
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -110,3 +95,25 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
+
+/**
+ * Setup socket.io
+ */
+
+if(req.user) {
+    const {Server} = require("socket.io");
+    const io = new Server(server);
+
+    io.on('connection', (socket) => {
+      console.log('a user connected');
+      socket.broadcast.emit('hi');
+      socket.on('chat message', (msg) => {
+
+            io.emit('chat message', msg);
+      });  
+      socket.on('disconnect', () => {
+        console.log('user disconnected');
+      });
+      
+    });
+}
